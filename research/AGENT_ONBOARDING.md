@@ -1,32 +1,52 @@
-# Agent Onboarding Guide - SuperInstance Papers
+# Agent Onboarding Guide - SuperInstance Orchestrator
 
-**Version:** 2.0
-**Date:** 2026-03-13
-**For:** New agents joining the SuperInstance research project
+**Version:** 4.0
+**Date:** 2026-03-14
+**For:** New agents joining multi-initiative research coordination
 
 ---
 
 ## Welcome
 
-You are joining a research project developing **60+ academic papers** on distributed AI systems, hardware acceleration, and cross-cultural education. This guide will get you productive quickly.
+You are joining a **multi-initiative research coordination** project spanning distributed AI systems, cross-cultural knowledge synthesis, and universal accessibility through visual documentation.
+
+---
+
+## Executive Summary
+
+This orchestrator coordinates **three major research initiatives**:
+
+### 1. SuperInstance Papers
+- **60+ academic white papers** on distributed AI systems
+- **Status:** 30 complete, 5 in progress, 25 proposed
+- **Focus:** Mathematical frameworks, hardware acceleration, cross-cultural education
+- **Repository:** https://github.com/SuperInstance/SuperInstance-papers
+
+### 2. Ancient Language Translation
+- **Cross-cultural knowledge synthesis** across 8 ancient and oral traditions
+- **Status:** Framework complete, 7 language profiles created
+- **Focus:** Concept-to-concept translation (not word-for-word)
+- **Location:** `research/cross-cultural-translation/`
+
+### 3. SpreadsheetMoment
+- **Visual documentation for universal accessibility**
+- **Status:** Repository created, project plan established
+- **Focus:** Three-tier audience strategy (engineers, general, 5th graders)
+- **Repository:** https://github.com/SuperInstance/spreadsheet-moment
 
 ---
 
 ## Project Overview
 
 ### Mission
-Transform mathematical framework papers into publication-ready dissertations with complete proofs, implementations, and validation.
+Coordinate three interconnected initiatives: academic publication, cross-cultural knowledge synthesis, and universal accessibility through visual documentation.
 
 ### Current State
-| Phase | Papers | Status |
-|-------|--------|--------|
-| Phase 1 (P1-P23) | 23 | 18 Complete, 5 In Progress |
-| Phase 2 (P24-P30) | 7 | Complete with simulations |
-| Phase 3 (P31-P40) | 10 | Queued |
-| Phase 4 (P41-P47) | 7 | 5 Complete (ecosystem) |
-| Phase 5 (P51-P60) | 10 | Proposed (Lucineer) |
-
-**Total:** 60+ papers
+| Initiative | Status | Completion |
+|------------|--------|------------|
+| SuperInstance Papers (P1-P60) | Active | 30/60 complete |
+| Ancient Language Translation | Framework Ready | 7/8 profiles |
+| SpreadsheetMoment | Inception | Structure complete |
 
 ---
 
@@ -39,23 +59,32 @@ polln/
 │   └── 24-30/                     # Phase 2 papers with simulations
 ├── research/
 │   ├── lucineer_analysis/         # P51-P60 hardware papers
-│   │   ├── LUCINEER_ANALYSIS.md
-│   │   ├── LUCINEER_PAPER_PROPOSALS.md
-│   │   ├── LUCINEER_EDUCATIONAL_COMPONENTS.md
-│   │   └── LUCINEER_SUPERINSTANCE_SYNERGIES.md
 │   ├── ecosystem_papers/          # P41-P47 complete papers
-│   │   ├── P41_Tripartite_Consensus_Architecture.md
-│   │   ├── P43_Deadband_Knowledge_Distillation.md
-│   │   ├── P45_Cognitive_Memory_Hierarchy.md
-│   │   ├── P46_Context_Handoff_Protocols.md
-│   │   └── P47_Escalation_Routing.md
 │   ├── ecosystem_simulations/     # Validation code
-│   │   ├── escalation_router_simulation.py
-│   │   └── consensus_engine_simulation.py
-│   ├── PHASE_5_PROPOSAL.md        # Next phase plan
-│   └── AGENT_ONBOARDING.md        # This file
+│   ├── cross-cultural-translation/ # Ancient language project
+│   │   ├── ANCIENT_LANGUAGE_GUIDE.md
+│   │   ├── SCHOLAR_RESEARCH_SUMMARY.md
+│   │   └── LANGUAGE_PROFILE_*.md  # 7 language profiles
+│   ├── simulation_framework/      # Multi-API simulation tools
+│   ├── AGENT_ONBOARDING.md        # This file
+│   └── PHASE_5_PROPOSAL.md        # Historical phase plan
+├── spreadsheet-moment/            # NEW: Visual documentation project
+│   ├── PROJECT_PLAN.md            # 22-week development plan
+│   ├── docs/
+│   │   ├── technical/             # Engineer documentation
+│   │   ├── general/               # General audience
+│   │   └── educational/           # 5th grader slides
+│   └── assets/
+│       └── iterations/            # Image generation iterations
+├── mcp-servers/                   # Model Context Protocol servers
+│   ├── groq-mcp/                  # FREE rapid iteration
+│   ├── deepinfra-mcp/             # Cost-effective research
+│   ├── deepseek-thinker-mcp/      # Chain-of-thought
+│   ├── kimi-mcp/                  # 128K context
+│   ├── alibaba-mcp/               # Alibaba Qwen models
+│   └── alibaba-devops-mcp/        # Alibaba DevOps automation
 ├── SuperInstance_Ecosystem/       # Production TypeScript code
-│   └── equipment/                 # 13 npm packages
+├── apikey/                        # API keys (git-ignored)
 └── CLAUDE.md                      # Project orchestrator config
 ```
 
@@ -84,6 +113,8 @@ The project now includes **Model Context Protocol (MCP) servers** for cost-effec
 | **DeepInfra** | Research ideation, large context | $0.03-0.20/1M | Novel insights, cost-sensitive work |
 | **DeepSeek** | Chain-of-thought reasoning | $0.10/1M | Math proofs, explicit reasoning |
 | **Kimi** | Ultra-large context (128K) | $0.12-0.50/1M | Entire papers, synthesis |
+| **Alibaba** | Chinese market, Qwen models | $0.02-0.15/1M | Chinese language, Asia deployment |
+| **Alibaba DevOps** | ACK, Function Compute | Infrastructure | Kubernetes deployment, CI/CD |
 
 **Setup:**
 ```bash
@@ -92,6 +123,8 @@ cd mcp-servers/groq-mcp && pip install -e .
 cd ../deepinfra-mcp && pip install -e .
 cd ../deepseek-thinker-mcp && pip install -e .
 cd ../kimi-mcp && pip install -e .
+cd ../alibaba-mcp && pip install -e .
+cd ../alibaba-devops-mcp && pip install -e .
 ```
 
 **Configuration:**
@@ -296,7 +329,92 @@ research/cross-cultural-translation/
 
 **See:** `research/cross-cultural-translation/ANCIENT_LANGUAGE_GUIDE.md` for complete methodology
 
-### Step 5: Legacy Multi-API Simulation Tools
+### Step 5: SpreadsheetMoment Project (NEW 2026-03-14)
+
+**Mission: Universal Accessibility Through Visual Documentation**
+
+SpreadsheetMoment creates visual documentation that makes complex distributed systems concepts accessible to everyone, from senior engineers to 5th graders.
+
+**Project Philosophy:**
+- **Visual-first:** Diagrams and illustrations before text
+- **Three-tier strategy:** Different depth for different audiences
+- **Iterative refinement:** Multi-model validation for universal appeal
+- **Cultural translation:** Name chosen through 8-language research
+
+**Project Structure:**
+```
+spreadsheet-moment/
+├── PROJECT_PLAN.md              # 22-week development timeline
+├── docs/
+│   ├── NAME_RESEARCH.md         # Name translation research
+│   ├── technical/               # Senior engineer documentation (12 pages)
+│   ├── general/                 # General audience documentation (12 pages)
+│   └── educational/             # 5th grader slide presentation
+└── assets/
+    └── iterations/              # Image generation iterations
+```
+
+**Three Audience Tiers:**
+
+| Tier | Audience | Format | Depth |
+|------|----------|--------|-------|
+| **Technical** | Senior Engineers | 12-page document | Mathematical rigor, implementation details |
+| **General** | Laypeople | 12-page document | Conceptual understanding, real-world analogies |
+| **Educational** | 5th Graders | Slide presentation | Visual storytelling, interactive examples |
+
+**Multi-Model Validation Workflow:**
+
+For each image and document:
+1. **Create initial version** using Claude Code
+2. **Validate with multiple models** via MCP:
+   - Groq (FREE) - Quick iteration and devil's advocate
+   - DeepInfra - Cost-effective diverse perspectives
+   - DeepSeek - Chain-of-thought reasoning
+   - Alibaba Qwen - Cross-cultural appeal check
+   - Kimi - Universal accessibility analysis
+3. **Iterate** based on feedback
+4. **Save all iterations** to `assets/iterations/`
+
+**Image Generation Pipeline:**
+```
+Concept → 3 versions → Multi-model critique → Refine → Final
+```
+
+Example iteration tracking:
+```
+assets/iterations/
+├── distributed_consensus_v1.png
+├── distributed_consensus_v1_feedback.md
+├── distributed_consensus_v2.png
+├── distributed_consensus_v2_feedback.md
+└── distributed_consensus_final.png
+```
+
+**Content Creation Workflow:**
+1. Start with technical document (engineers)
+2. Simplify for general audience (maintain accuracy)
+3. Create visual narrative for 5th graders
+4. Validate each tier with multi-model feedback
+5. Ensure "zoom" consistency: deeper detail at each level
+
+**Agent Instructions:**
+1. Use MCP calls to multiple models for validation
+2. Save all iterations (don't delete early versions)
+3. Document feedback and how you addressed it
+4. Test with different cultural perspectives (Alibaba, Kimi)
+5. Verify 5th grader content actually appeals to that age group
+
+**Success Metrics:**
+- Technical accuracy (reviewer approval)
+- General accessibility (non-technical person understands)
+- Youth engagement (5th grader finds interesting)
+- Universal appeal (positive feedback from 3+ cultural perspectives)
+- Visual clarity (diagrams stand alone without text)
+
+**Repository:** https://github.com/SuperInstance/spreadsheet-moment
+**Project Plan:** `spreadsheet-moment/PROJECT_PLAN.md`
+
+### Step 6: Legacy Multi-API Simulation Tools
 
 The project includes a multi-API simulation framework for research ideation and validation.
 
@@ -334,7 +452,7 @@ python run_5_phase_simulation.py
 4. Use **async batching** for 50% savings on large simulation batches
 5. Save results to `simulation_framework/results/` for tracking
 
-### Step 4: Choose Your Focus
+### Step 7: Choose Your Focus
 
 #### Option A: Complete Phase 1 Papers (P1, P5, P7-P9, P11, P19, P21)
 - Read existing papers in `papers/01-23/`
@@ -355,6 +473,18 @@ python run_5_phase_simulation.py
 - Read `research/lucineer_analysis/LUCINEER_PAPER_PROPOSALS.md`
 - Create complete papers from proposals
 - Include hardware validation plans
+
+#### Option E: Create SpreadsheetMoment Documentation
+- Read `spreadsheet-moment/PROJECT_PLAN.md`
+- Create three-tier documentation (technical, general, educational)
+- Use multi-model validation via MCP
+- Generate visual content with iterative refinement
+
+#### Option F: Ancient Language Translation
+- Read `research/cross-cultural-translation/ANCIENT_LANGUAGE_GUIDE.md`
+- Study language profiles in `LANGUAGE_PROFILE_*.md`
+- Create conceptual translations (not word-for-word)
+- Document novel insights from cross-cultural synthesis
 
 ---
 
@@ -643,4 +773,4 @@ When you complete work or context is full:
 
 **Welcome to the team!**
 **Last Updated:** 2026-03-14
-**Version:** 3.0 (Ancient Language Translation Edition)
+**Version:** 4.0 (Multi-Initiative Coordination Edition)
