@@ -9,7 +9,7 @@
     "allowJs": true,
     "checkJs": false,
     "jsx": "react",
-    "noEmit": true,
+    "noEmit": false,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -19,7 +19,7 @@
     "declarationMap": false,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
@@ -31,7 +31,8 @@
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "workers/**/*"
   ],
   "exclude": [
     "node_modules",

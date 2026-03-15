@@ -19,6 +19,7 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "build": "tsc",
+    "build:worker": "tsc",
     "db:migrate": "wrangler d1 execute spreadsheetmoment-prod --file=migrations/001_initial_schema.sql",
     "db:migrate:staging": "wrangler d1 execute spreadsheetmoment-staging --file=migrations/001_initial_schema.sql",
     "db:backup": "node scripts/backup-db.js",
@@ -32,6 +33,8 @@
   },
   "dependencies": {
     "@cloudflare/workers-types": "^4.20231218.0",
+    "graphql": "^16.13.1",
+    "graphql-ws": "^6.0.7",
     "itty-router": "^4.0.20",
     "zod": "^3.22.4"
   },

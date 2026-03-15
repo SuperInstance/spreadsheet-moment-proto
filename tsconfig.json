@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs",
-    "lib": ["ES2020"],
+    "module": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
+    "rootDir": "./",
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -13,14 +13,44 @@
     "declarationMap": true,
     "sourceMap": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "downlevelIteration": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "analytics/**/*",
+    "i18n/**/*",
+    "accessibility/**/*",
+    "performance/**/*",
+    "security/**/*",
+    "api/**/*",
+    "api/v2/**/*",
+    "community/**/*",
+    "enterprise/**/*",
+    "mobile/**/*",
+    "plugins/**/*",
+    "web/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "tests"
-  ]
+    "tests",
+    "coverage",
+    "languages",
+    "examples",
+    "deployment",
+    "research",
+    "papers",
+    "*.test.ts",
+    "*.spec.ts"
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }

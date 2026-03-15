@@ -1,93 +1,116 @@
-# POLLN WebSocket API
+# API Overview
 
-Real-time monitoring and control API for POLLN (Pattern-Organized Large Language Network).
+The Spreadsheet Moment API provides programmatic access to all spreadsheet features.
 
-This WebSocket API provides real-time access to colony events, agent lifecycle management,
-dream cycle notifications, and KV-cache statistics.
+## Base URL
 
-## Quick Start
-
-### Installation
-
-```bash
-npm install polln
 ```
-
-### Basic Usage
-
-```typescript
-import { POLLNClient } from 'polln/api/client';
-
-// Create client
-const client = new POLLNClient({
-  url: 'ws://localhost:3000/api/ws',
-});
-
-// Connect
-await client.connect();
-
-// Subscribe to colony events
-client.subscribeToColony('colony-1', ['agent_registered', 'stats_updated']);
-
-// Query stats
-const stats = await client.queryStats('colony-1');
-console.log(stats);
+https://api.spreadsheetmoment.com/v1
 ```
-
-## Servers
-
-- **Local development**: `ws://localhost:3000/api/ws`
-- **Production**: `wss://api.polln.io/api/ws`
 
 ## Authentication
 
-When authentication is enabled, include a token in your first message:
+All API requests require authentication using an API key:
 
-```typescript
-const client = new POLLNClient({
-  url: 'ws://localhost:3000/api/ws',
-  token: 'your-api-token',
-});
+```bash
+curl https://api.spreadsheetmoment.com/v1/spreadsheets \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-## Rate Limiting
+## Rate Limits
 
-Rate limiting is enforced per connection:
+- **Free tier**: 100 requests/minute
+- **Pro tier**: 1000 requests/minute
+- **Enterprise**: Custom limits
 
-- **requestsPerMinute**: Maximum requests per minute (default: 100)
-- **burstLimit**: Maximum burst requests (default: 10)
+Rate limit headers are included in all responses:
 
-When rate limited, you'll receive:
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1640995200
+```
 
-```typescript
+## Core Resources
+
+### Spreadsheets
+
+Create, read, update, and delete spreadsheets.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/spreadsheets` | List spreadsheets |
+| POST | `/spreadsheets` | Create spreadsheet |
+| GET | `/spreadsheets/:id` | Get spreadsheet |
+| PATCH | `/spreadsheets/:id` | Update spreadsheet |
+| DELETE | `/spreadsheets/:id` | Delete spreadsheet |
+
+### Cells
+
+Manage individual cells and ranges.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/spreadsheets/:id/cells/:cellId` | Get cell |
+| PUT | `/spreadsheets/:id/cells/:cellId` | Set cell |
+| POST | `/spreadsheets/:id/cells/batch` | Batch set cells |
+| GET | `/spreadsheets/:id/ranges/:range` | Get range |
+
+### Webhooks
+
+Configure webhooks for real-time events.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/spreadsheets/:id/webhooks` | List webhooks |
+| POST | `/spreadsheets/:id/webhooks` | Create webhook |
+| DELETE | `/spreadsheets/:id/webhooks/:webhookId` | Delete webhook |
+
+## Response Format
+
+All responses follow this structure:
+
+```json
 {
-  type: 'error',
-  error: {
-    code: 'RATE_LIMITED',
-    message: 'Rate limit exceeded'
+  "data": { /* Response data */ },
+  "meta": {
+    "requestId": "req_12345",
+    "timestamp": "2024-01-01T00:00:00Z"
   }
 }
 ```
 
-## Table of Contents
+## Error Handling
 
-- [Message Protocol](websocket-protocol.md)
-- [Authentication](authentication.md)
-- [Endpoints](endpoints/)
-  - [Agents](endpoints/agents.md)
-  - [Colony](endpoints/colony.md)
-  - [Dream](endpoints/dream.md)
-  - [Cache](endpoints/cache.md)
-  - [Federation](endpoints/federation.md)
-- [Events](events.md)
-- [Errors](errors.md)
-- [Rate Limits](rate-limits.md)
-- [Examples](examples/)
+Errors follow this format:
 
-## License
+```json
+{
+  "error": {
+    "code": "validation_error",
+    "message": "Invalid cell reference",
+    "details": {
+      "field": "cellId",
+      "value": "INVALID"
+    }
+  }
+}
+```
 
-MIT - https://opensource.org/licenses/MIT
+### Error Codes
 
----
+| Code | Description |
+|------|-------------|
+| `validation_error` | Invalid request parameters |
+| `authentication_error` | Invalid API key |
+| `not_found` | Resource not found |
+| `rate_limit_error` | Rate limit exceeded |
+| `server_error` | Internal server error |
 
-*Generated from OpenAPI specification v1.0.0*
+## Next Steps
+
+- [Authentication](./authentication.md)
+- [Spreadsheets API](./spreadsheets.md)
+- [Cells API](./cells.md)
+- [Webhooks API](./webhooks.md)
+- [API Playground](./explorer/playground.md)

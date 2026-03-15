@@ -1,0 +1,312 @@
+# CI/CD Integration for Accessibility Testing
+# Runs automated accessibility tests on every PR and push
+
+name: Accessibility Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  accessibility-a11y:
+    name: Automated Accessibility Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install -g @playwright/test
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start development server
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run axe-core tests
+        run: npm run test:a11y:axe
+        continue-on-error: false
+
+      - name: Run Pa11y tests
+        run: npm run test:a11y:pa11y
+        continue-on-error: false
+
+      - name: Run Lighthouse accessibility tests
+        run: npm run test:a11y:lighthouse
+        continue-on-error: false
+
+      - name: Run Playwright accessibility tests
+        run: npx playwright test tests/accessibility/wcag-comprehensive.test.ts
+        continue-on-error: false
+
+      - name: Generate accessibility report
+        if: always()
+        run: |
+          npm run test:a11y:report
+          echo "Accessibility report generated"
+
+      - name: Upload accessibility results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: accessibility-results
+          path: |
+            tests/accessibility/results/
+            tests/accessibility/reports/
+          retention-days: 30
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const resultsPath = 'tests/accessibility/results/summary.json';
+
+            if (fs.existsSync(resultsPath)) {
+              const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+
+              const comment = `
+                ## 🎯 Accessibility Test Results
+
+                **Compliance Score:** ${results.complianceScore}%
+                **Status:** ${results.passed ? '✅ PASSED' : '❌ FAILED'}
+
+                ### Summary
+                - **Violations:** ${results.violations}
+                - **Passes:** ${results.passes}
+                - **Warnings:** ${results.warnings}
+
+                ### Critical Issues
+                ${results.criticalIssues.length > 0 ? results.criticalIssues.map(i => `- ❌ ${i}`).join('\n') : 'None ✅'}
+
+                ${results.complianceScore >= 98 ? '🎉 **Congratulations! 98%+ compliance achieved!**' : '⚠️ **Below target compliance. Please review issues.'}
+
+                [View full report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+              `;
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+      - name: Check compliance threshold
+        run: |
+          node -e "
+            const fs = require('fs');
+            const results = JSON.parse(fs.readFileSync('tests/accessibility/results/summary.json', 'utf8'));
+
+            if (results.complianceScore < 98) {
+              console.error(\`❌ Compliance score \${results.complianceScore}% is below 98% threshold\`);
+              process.exit(1);
+            }
+
+            console.log(\`✅ Compliance score \${results.complianceScore}% meets 98% threshold\`);
+          "
+
+  keyboard-navigation:
+    name: Keyboard Navigation Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start development server
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run keyboard navigation tests
+        run: npx playwright test tests/accessibility/keyboard-navigation.test.ts
+
+      - name: Check for keyboard traps
+        run: |
+          node scripts/check-keyboard-traps.js || echo "Keyboard trap check complete"
+
+  screen-reader-tests:
+    name: Screen Reader Compatibility Tests
+    runs-on: macos-latest # macOS for VoiceOver testing
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start development server
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run screen reader tests
+        run: npx playwright test tests/accessibility/screen-reader.test.ts
+
+  color-contrast-tests:
+    name: Color Contrast Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run color contrast tests
+        run: npm run test:contrast
+
+      - name: Validate color palette
+        run: |
+          node -e "
+            const { validatePalette, WCAG_AA_PALETTE } = require('./accessibility/ColorContrastSystem');
+            const validation = validatePalette(WCAG_AA_PALETTE);
+
+            if (!validation.valid) {
+              console.error('❌ Color palette validation failed:');
+              validation.issues.forEach(issue => console.error('  -', issue));
+              process.exit(1);
+            }
+
+            console.log('✅ Color palette is WCAG 2.1 AA compliant');
+          "
+
+  regression-tests:
+    name: Accessibility Regression Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start development server
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run regression tests
+        run: |
+          # Compare against baseline
+          npx playwright test tests/accessibility/baseline.test.ts
+
+      - name: Check for regressions
+        run: |
+          node scripts/check-accessibility-regression.js || echo "Regression check complete"
+
+  # Notify on failure
+  notify-on-failure:
+    name: Notify on Test Failure
+    needs: [accessibility-a11y, keyboard-navigation, screen-reader-tests, color-contrast-tests]
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            ❌ Accessibility tests failed!
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref }}
+            Commit: ${{ github.sha }}
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Create GitHub issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Accessibility Test Failure',
+              body: `
+                Accessibility tests failed on branch \`${context.ref}\`.
+
+                **Failed Jobs:**
+                ${{ needs.accessibility-a11y.result == 'failure' && '- Accessibility tests' || '' }}
+                ${{ needs.keyboard-navigation.result == 'failure' && '- Keyboard navigation' || '' }}
+                ${{ needs.screen-reader-tests.result == 'failure' && '- Screen reader tests' || '' }}
+                ${{ needs.color-contrast-tests.result == 'failure' && '- Color contrast tests' || '' }}
+
+                **Run:** ${{ github.server_url }}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
+
+                Please review and fix the accessibility issues.
+              `,
+              labels: ['accessibility', 'bug', 'priority-high']
+            })

@@ -1,204 +1,205 @@
 # Authentication
 
-## Overview
+Learn how to authenticate with the Spreadsheet Moment API.
 
-POLLN WebSocket API supports token-based authentication. When enabled, clients must authenticate before sending other messages.
+## API Key Authentication
 
-## Authentication Flow
+The primary authentication method is API keys.
 
-### 1. Server-Side Token Generation
+### Generate an API Key
 
-```typescript
-import { AuthenticationMiddleware } from 'polln/api';
+1. Log in to [Spreadsheet Moment](https://spreadsheetmoment.com)
+2. Navigate to Settings → API Keys
+3. Click "Generate New Key"
+4. Copy and store securely
 
-const auth = new AuthenticationMiddleware();
+### Use API Key
 
-// Generate token with permissions
-const token = auth.generateToken(
-  'gardener-id',           // Gardener/developer ID
-  [
-    { resource: 'colony', actions: ['read', 'write'] },
-    { resource: 'agent', actions: ['read', 'write'] },
-    { resource: 'dream', actions: ['read', 'write'] },
-    { resource: 'stats', actions: ['read'] },
-  ],
-  24 * 60 * 60 * 1000      // Expires in 24 hours (optional)
-);
+Include the API key in the `Authorization` header:
 
-console.log('Token:', token);
+```bash
+curl https://api.spreadsheetmoment.com/v1/spreadsheets \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-### 2. Client Authentication
+### Environment Variables
 
-Send authentication as first message:
+Store API keys in environment variables:
+
+```bash
+# .env
+SPREADSHEET_MOMENT_API_KEY=your_api_key_here
+```
 
 ```typescript
-const ws = new WebSocket('ws://localhost:3000/api/ws');
+import { SpreadsheetMoment } from '@spreadsheetmoment/sdk'
 
-ws.onopen = () => {
-  // Send authentication
-  ws.send(JSON.stringify({
-    id: 'msg_1',
-    timestamp: Date.now(),
-    type: 'authenticate',
-    payload: {
-      token: 'your-api-token'
-    }
-  }));
-};
+const client = new SpreadsheetMoment({
+  apiKey: process.env.SPREADSHEET_MOMENT_API_KEY
+})
+```
 
-ws.onmessage = (event) => {
-  const message = JSON.parse(event.data);
+## SDK Authentication
 
-  if (message.type === 'authenticated') {
-    console.log('Authentication successful');
-    // Now you can send other messages
-  } else if (message.type === 'error' && message.error?.code === 'UNAUTHORIZED') {
-    console.error('Authentication failed');
+### JavaScript SDK
+
+```typescript
+import { SpreadsheetMoment } from '@spreadsheetmoment/sdk'
+
+const client = new SpreadsheetMoment({
+  apiKey: 'your-api-key',
+  environment: 'production' // or 'development'
+})
+```
+
+### Python SDK
+
+```python
+from spreadsheetmoment import SpreadsheetMoment
+
+client = SpreadsheetMoment(
+    api_key='your-api-key',
+    environment='production'
+)
+```
+
+## OAuth 2.0
+
+For user-authorized access, use OAuth 2.0:
+
+### Authorization Flow
+
+1. **Redirect to authorization**
+
+```
+https://auth.spreadsheetmoment.com/oauth/authorize?
+  client_id=YOUR_CLIENT_ID&
+  redirect_uri=YOUR_REDIRECT_URI&
+  scope=spreadsheets.read+spreadsheets.write&
+  response_type=code
+```
+
+2. **Handle callback**
+
+Receive authorization code at `redirect_uri`
+
+3. **Exchange for access token**
+
+```bash
+curl -X POST https://auth.spreadsheetmoment.com/oauth/token \
+  -d client_id=YOUR_CLIENT_ID \
+  -d client_secret=YOUR_CLIENT_SECRET \
+  -d code=AUTHORIZATION_CODE \
+  -d grant_type=authorization_code \
+  -d redirect_uri=YOUR_REDIRECT_URI
+```
+
+Response:
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+4. **Use access token**
+
+```bash
+curl https://api.spreadsheetmoment.com/v1/spreadsheets \
+  -H "Authorization: Bearer ACCESS_TOKEN"
+```
+
+### Refresh Token
+
+```bash
+curl -X POST https://auth.spreadsheetmoment.com/oauth/token \
+  -d client_id=YOUR_CLIENT_ID \
+  -d client_secret=YOUR_CLIENT_SECRET \
+  -d refresh_token=REFRESH_TOKEN \
+  -d grant_type=refresh_token
+```
+
+## Token Security
+
+### Best Practices
+
+1. **Never commit API keys** to version control
+2. **Use environment variables** for secrets
+3. **Rotate keys regularly** (recommend every 90 days)
+4. **Use separate keys** for development and production
+5. **Limit key scopes** to minimum required permissions
+
+### Scopes
+
+| Scope | Description |
+|-------|-------------|
+| `spreadsheets.read` | Read spreadsheet data |
+| `spreadsheets.write` | Modify spreadsheet data |
+| `spreadsheets.delete` | Delete spreadsheets |
+| `webhooks.manage` | Manage webhooks |
+| `admin.full` | Full administrative access |
+
+## Troubleshooting
+
+### Common Errors
+
+#### 401 Unauthorized
+
+```json
+{
+  "error": {
+    "code": "authentication_error",
+    "message": "Invalid API key"
   }
-};
-```
-
-## Permissions
-
-Tokens include permissions for specific resources and actions:
-
-### Resources
-
-- `colony`: Colony management and events
-- `agent`: Agent lifecycle and control
-- `dream`: Dream cycle operations
-- `stats`: Statistics and monitoring
-
-### Actions
-
-- `read`: Query and subscribe to data
-- `write`: Send commands and modify state
-- `admin`: Administrative operations
-
-### Permission Examples
-
-```typescript
-// Read-only access
-const readOnlyToken = auth.generateToken('gardener-1', [
-  { resource: 'colony', actions: ['read'] },
-  { resource: 'agent', actions: ['read'] },
-  { resource: 'stats', actions: ['read'] },
-]);
-
-// Full access
-const fullAccessToken = auth.generateToken('gardener-2', [
-  { resource: 'colony', actions: ['read', 'write', 'admin'] },
-  { resource: 'agent', actions: ['read', 'write'] },
-  { resource: 'dream', actions: ['read', 'write'] },
-  { resource: 'stats', actions: ['read'] },
-]);
-
-// Stats-only access
-const statsToken = auth.generateToken('gardener-3', [
-  { resource: 'stats', actions: ['read'] },
-]);
-```
-
-## Token Management
-
-### Validate Token
-
-```typescript
-const apiToken = auth.validateToken('your-api-token');
-
-if (apiToken) {
-  console.log('Token valid:', {
-    gardenerId: apiToken.gardenerId,
-    permissions: apiToken.permissions,
-    expiresAt: new Date(apiToken.expiresAt),
-  });
-} else {
-  console.log('Token invalid or expired');
 }
 ```
 
-### Revoke Token
+**Solutions:**
+- Verify API key is correct
+- Check key hasn't been revoked
+- Ensure key has required scopes
 
-```typescript
-auth.revokeToken('your-api-token');
-console.log('Token revoked');
-```
+#### 403 Forbidden
 
-### Check Permissions
-
-```typescript
-const client = auth.authenticate('client-id', 'your-api-token');
-
-if (client && auth.hasPermission(client, 'colony', 'write')) {
-  console.log('Client can write to colony');
+```json
+{
+  "error": {
+    "code": "authorization_error",
+    "message": "Insufficient permissions"
+  }
 }
 ```
 
-### Cleanup Expired Tokens
+**Solutions:**
+- Check key has required scopes
+- Verify resource access permissions
 
-```typescript
-// Run periodically (e.g., every hour)
-const count = auth.cleanupExpiredTokens();
-console.log(`Cleaned up ${count} expired tokens`);
+### Testing Authentication
+
+Test your API key:
+
+```bash
+curl https://api.spreadsheetmoment.com/v1/auth/verify \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-## Configuration
+Response:
 
-### Server Configuration
-
-```typescript
-import { createPOLLNServer } from 'polln/api';
-
-const server = createPOLLNServer({
-  port: 3000,
-  auth: {
-    enableAuth: true,
-    defaultToken: 'default-dev-token',  // For development
-    tokenExpiresIn: 24 * 60 * 60 * 1000,  // 24 hours
-  },
-});
-
-await server.start();
+```json
+{
+  "data": {
+    "valid": true,
+    "keyId": "key_12345",
+    "scopes": ["spreadsheets.read", "spreadsheets.write"]
+  }
+}
 ```
 
-## Security Considerations
+## Next Steps
 
-1. **Use WSS (WebSocket Secure) in production**
-
-```typescript
-const client = new POLLNClient({
-  url: 'wss://api.polln.io/api/ws',
-  token: 'your-token',
-});
-```
-
-2. **Store tokens securely**
-
-- Never expose tokens in client-side code
-- Use HTTP-only cookies for web clients
-- Implement proper CORS headers
-
-3. **Implement rate limiting per token**
-
-```typescript
-const server = createPOLLNServer({
-  port: 3000,
-  rateLimit: {
-    requestsPerMinute: 100,
-    burstLimit: 10,
-  },
-});
-```
-
-4. **Monitor and log authentication events**
-
-```typescript
-server.on('connection:opened', ({ clientId }) => {
-  console.log(`Client connected: ${clientId}`);
-});
-
-server.on('connection:closed', ({ clientId }) => {
-  console.log(`Client disconnected: ${clientId}`);
-});
-```
+- [API Overview](./overview.md)
+- [Spreadsheets API](./spreadsheets.md)
+- [Webhooks](./webhooks.md)

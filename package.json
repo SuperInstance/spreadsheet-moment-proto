@@ -25,6 +25,10 @@
       "import": "./dist/api/client/index.js",
       "types": "./dist/api/client/index.d.ts"
     },
+    "./api/v2": {
+      "import": "./dist/api/v2/index.js",
+      "types": "./dist/api/v2/index.d.ts"
+    },
     "./sdk": {
       "import": "./dist/sdk/index.js",
       "types": "./dist/sdk/index.d.ts"
@@ -48,6 +52,46 @@
     "./spreadsheet/collaboration": {
       "import": "./dist/spreadsheet/collaboration/index.js",
       "types": "./dist/spreadsheet/collaboration/index.d.ts"
+    },
+    "./analytics": {
+      "import": "./dist/analytics/index.js",
+      "types": "./dist/analytics/index.d.ts"
+    },
+    "./i18n": {
+      "import": "./dist/i18n/index.js",
+      "types": "./dist/i18n/index.d.ts"
+    },
+    "./accessibility": {
+      "import": "./dist/accessibility/index.js",
+      "types": "./dist/accessibility/index.d.ts"
+    },
+    "./performance": {
+      "import": "./dist/performance/index.js",
+      "types": "./dist/performance/index.d.ts"
+    },
+    "./security": {
+      "import": "./dist/security/index.js",
+      "types": "./dist/security/index.d.ts"
+    },
+    "./community": {
+      "import": "./dist/community/index.js",
+      "types": "./dist/community/index.d.ts"
+    },
+    "./enterprise": {
+      "import": "./dist/enterprise/index.js",
+      "types": "./dist/enterprise/index.d.ts"
+    },
+    "./mobile": {
+      "import": "./dist/mobile/index.js",
+      "types": "./dist/mobile/index.d.ts"
+    },
+    "./plugins": {
+      "import": "./dist/plugins/index.js",
+      "types": "./dist/plugins/index.d.ts"
+    },
+    "./web": {
+      "import": "./dist/web/index.js",
+      "types": "./dist/web/index.d.ts"
     }
   },
   "scripts": {
@@ -64,6 +108,19 @@
     "test:kv": "jest src/core/__tests__/kv*.test.ts",
     "test:lora": "jest src/core/lora/__tests__",
     "test:multi-colony": "jest src/core/colony-manager/__tests__ src/core/inter-colony/__tests__ src/core/colony-lifecycle/__tests__",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:firefox": "playwright test --project=firefox",
+    "test:e2e:webkit": "playwright test --project=webkit",
+    "test:e2e:mobile": "playwright test --project='Mobile Chrome'",
+    "test:e2e:accessibility": "playwright test --project=accessibility",
+    "test:e2e:i18n": "playwright test --project=i18n-es --project=i18n-fr --project=i18n-de",
+    "test:e2e:visual": "playwright test --project=visual-regression",
+    "test:e2e:report": "playwright show-report",
+    "test:e2e:install": "playwright install --with-deps chromium firefox webkit",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
@@ -197,7 +254,10 @@
     "ts-jest": "^29.2.5",
     "typescript": "^5",
     "vitepress": "^1.6.4",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "@playwright/test": "^1.48.0",
+    "axe-playwright": "^2.0.0",
+    "@axe-core/playwright": "^4.10.0"
   },
   "optionalDependencies": {
     "jsPDF": "^2.5.2",
