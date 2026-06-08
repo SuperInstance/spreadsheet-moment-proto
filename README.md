@@ -227,3 +227,12 @@ MIT — see [LICENSE](LICENSE)
 **Website:** https://spreadsheet-moment.pages.dev
 **GitHub:** https://github.com/SuperInstance/spreadsheet-moment
 **Research:** https://github.com/SuperInstance/SuperInstance-papers
+
+---
+
+## 🚢 Fleet Integration
+
+Part of the SuperInstance spreadsheet ecosystem. Uses the same ternary {-1,0,+1}
+values as the 220+ repo MIDI fleet.
+
+**Related Repos:** fleet-ternary-music, fleet-orchestra, fleet-arm-compat
